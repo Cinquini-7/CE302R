@@ -1,5 +1,7 @@
-#   Aula Módulo 3
+#   Aula Módulo 3 - Wagner
+#(Estrutura Switch - Empilhamento de if-else, para testar um valor contra um conjunto de strings)
 
+/
 # Exercício Saudação
 h <- 20
 
@@ -16,13 +18,31 @@ if (h >= 6 & h < 12) {
 
 saudacao
 
+#Exercício de switch
+animal <- "gato"
+som <- 
+    switch(animal,
+           "cachorro" = {
+               latir()
+           },
+           "gato" = {
+               miar()
+           },
+           "laura" = {
+               ocorre()
+           },
+           {         
+               silencio()
+               })
+som
+
 # Exercício tipo de média
 #tipo <- "aritmetica"
 #tipo <- "harmonica"
-#tipo <- "geometrica"
-tipo <- "ajhfaksfhdkashd"
+tipo <- "geometrica"
+#tipo <- "ajhfaksfhdkashd"
 
-x <- 1:10
+x <- 1:99
 
 switch(tipo,
        "aritmetica" = {
@@ -62,7 +82,7 @@ for(i in 1:10) {
 
 # Exercício · Lançamento de dados
 n_max <- 100
-tentativas <- 1
+tentativas <- 72
 while(tentativas < n_max) {
     l1 <- sample(1:6, 3, replace = TRUE) # joga os dados
     l1_ordenado <- sort(l1) # ordenada
@@ -177,7 +197,7 @@ calcula_imc <- function(peso, altura) {
     classif <- labels[findInterval(imc, limits)]
     return(list(IMC = imc, Classificao = classif))
 }
-calcula_imc(peso = 80, altura = 1.80)
+calcula_imc(peso = 60, altura = 1.65)
 
 
 # Argumento com valor default
