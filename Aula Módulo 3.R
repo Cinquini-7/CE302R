@@ -1,7 +1,7 @@
 #   Aula Módulo 3 - Wagner
+
 #(Estrutura Switch - Empilhamento de if-else, para testar um valor contra um conjunto de strings)
 
-/
 # Exercício Saudação
 h <- 20
 
