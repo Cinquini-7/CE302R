@@ -761,6 +761,7 @@ x %>%
 x <- 1:10
 x
 x %<>% log()
+<<<<<<< HEAD
 
 
 
@@ -1008,3 +1009,5 @@ cat("Resposta 5 (Média Emma Sullivan):",
     format_decimal(resposta_5), "minutos\n")
 
 cat("==================================================\n")
+=======
+>>>>>>> 14408292171c3f2a6aad9251db9f06f504350f59
