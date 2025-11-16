@@ -761,18 +761,19 @@ x %>%
 x <- 1:10
 x
 x %<>% log()
+#<<<<<<< HEAD-----------------------------------------------------------------------------------------------------------------
 
+#####========== Exercício 1---------------------
+# --- 1. CONFIGURAÇÃO: Limpar Ambiente e Carregar Pacotes ---
+# Limpa o ambiente para garantir que não há dataframes antigos
+rm(list = ls())
 
-
-#========= Exercício 1
-# --- 1. CONFIGURAÇÃO: Carregar Pacotes ---
-# install.packages("tidyverse")
-# install.packages("readr")
+# Carregar pacotes
 library(tidyverse)
 library(readr)
 
 # --- 2. FUNÇÃO HAVERSINE ---
-# (Implementação padrão para calcular distância em km)
+# (Implementação robusta para calcular distância em km)
 haversine_distance <- function(lon1, lat1, lon2, lat2, r = 6371) {
     # Função interna para converter graus em radianos
     to_radians <- function(degrees) degrees * pi / 180
@@ -797,26 +798,25 @@ haversine_distance <- function(lon1, lat1, lon2, lat2, r = 6371) {
 
 # --- 3. CARREGAR DADOS ---
 # !!! ATENÇÃO: Ajuste o caminho para o local do seu arquivo "michelin.csv" !!!
-# 2. CARREGAR DADOS
-caminho_arquivo <- "C:\\Users\\cinqu\\Downloads\\michelin.csv"
+caminho_arquivo <- "C:\\Users\\cinqu\\Downloads\\michelin.csv" 
 tryCatch({
-    dados_michelin <- read_csv(caminho_arquivo)
+    dados_michelin <- read_csv(caminho_arquivo, show_col_types = FALSE)
 }, error = function(e) {
     stop(paste("Erro ao ler o arquivo:", caminho_arquivo, ". Verifique o caminho."))
 })
 
 # --- 4. DEFINIR PONTO DE PARTIDA ---
-# (Conforme o enunciado: "Le Farçon" em "Courchevel, France")
+# (Conforme o enunciado: "Flocons de Sel" em "Megève, France")
 restaurante_inicial <- dados_michelin %>%
     filter(
-        grepl("Le Farçon", Name, ignore.case = TRUE) &
-            grepl("Courchevel, France", Location, ignore.case = TRUE)
+        grepl("Flocons de Sel", Name, ignore.case = TRUE) &
+            grepl("Megève, France", Location, ignore.case = TRUE)
     ) %>%
     slice(1) # Garante que temos apenas uma linha
 
 # Verificar se o restaurante foi encontrado
 if(nrow(restaurante_inicial) == 0) {
-    stop("RESTAURANTE INICIAL 'Le Farçon' em 'Courchevel, France' NÃO ENCONTRADO. Verifique o dataset.")
+    stop("RESTAURANTE INICIAL 'Flocons de Sel' em 'Megève, France' NÃO ENCONTRADO. Verifique o dataset.")
 }
 
 # Armazenar os dados iniciais
@@ -833,7 +833,7 @@ dados_processados <- dados_michelin %>%
             grepl("3.*[Ss]tar", Award) ~ 3,
             grepl("2.*[Ss]tar", Award) ~ 2,
             grepl("1.*[Ss]tar", Award) ~ 1,
-            TRUE ~ 0 # Inclui "Bib Gourmand", "Green Star", etc. como 0
+            TRUE ~ 0
         )
     )
 
@@ -858,33 +858,34 @@ resposta1_data <- dados_com_distancia %>%
 
 resposta1 <- round(resposta1_data$distancia_inicial[1], 2)
 
-# Q2: Restaurantes (1, 2 ou 3 estrelas) a uma distância de 3000 km?
-# (Inclui o restaurante inicial, pois 0 km <= 3000 km)
+# Q2: Restaurantes (1, 2 ou 3 estrelas) a uma distância de 100 km?
+# (Parâmetro novo: 100 km)
 resposta2_data <- dados_com_distancia %>%
     filter(
         estrelas %in% c(1, 2, 3), 
-        distancia_inicial <= 3000
+        distancia_inicial <= 100
     )
 
 resposta2 <- nrow(resposta2_data)
 
-# Q3: Aniversário (>= 1 estrela, até 4 dinheiros, <= 2000 km, fora da cidade inicial)
+# Q3: Aniversário (>= 1 estrela, até 3 dinheiros, <= 1500 km, fora da cidade inicial)
+# (Parâmetros novos: 3 dinheiros, 1500 km)
 resposta3_data <- dados_com_distancia %>%
     filter(
         estrelas >= 1,
-        distancia_inicial <= 2000,
-        Location != location_inicial, # Fora de "Courchevel, France"
-        !is.na(Price), # Garantir que o preço não é NA
-        nchar(Price) <= 4  # Interpretação de "até 4 dinheiros" (ex: "€", "€€", "€€€", "€€€€")
+        distancia_inicial <= 1500,
+        Location != location_inicial, # Fora de "Megève, France"
+        !is.na(Price), 
+        nchar(Price) <= 3  # Interpretação de "até 3 dinheiros" (ex: "€", "€€", "€€€")
     )
 
 resposta3 <- nrow(resposta3_data)
 
-# Q4: Distância mínima (km) para culinária "Traditional Cuisine"?
-# (Excluímos o próprio restaurante inicial, que tem distância 0)
+# Q4: Distância mínima (km) para culinária "Modern Cuisine"?
+# (Parâmetro novo: "Modern Cuisine")
 resposta4_data <- dados_com_distancia %>%
     filter(
-        Cuisine == "Traditional Cuisine",
+        Cuisine == "Modern Cuisine",
         distancia_inicial > 0 # Exclui o próprio restaurante
     ) %>%
     arrange(distancia_inicial)
@@ -894,117 +895,132 @@ resposta4 <- round(resposta4_data$distancia_inicial[1], 2)
 # --- 7. EXIBIR RESULTADOS FINAIS ---
 cat("\n")
 cat("==============================================================\n")
-cat("RESULTADOS DA JORNADA MICHELIN (Início: Le Farçon)\n")
+cat("RESULTADOS DA JORNADA MICHELIN (Início: Flocons de Sel)\n")
 cat("==============================================================\n")
 cat("Restaurante inicial:", restaurante_inicial$Name, "\n")
 cat("Localização:", restaurante_inicial$Location, "\n\n")
 
 cat("Resposta 1 (Próximo 1 Estrela):", resposta1, "km\n")
-cat("Resposta 2 (Restaurantes 1-3 estrelas <= 3000km):", resposta2, "restaurantes\n")
+cat("Resposta 2 (Restaurantes 1-3 estrelas <= 100km):", resposta2, "restaurantes\n")
 cat("Resposta 3 (Opções de Aniversário):", resposta3, "restaurantes\n")
-cat("Resposta 4 (Dist. Mín. 'Traditional Cuisine'):", resposta4, "km\n")
+cat("Resposta 4 (Dist. Mín. 'Modern Cuisine'):", resposta4, "km\n")
 cat("==============================================================\n")
 
-#========= Exercício 2
-# --- 1. CONFIGURAÇÃO: Carregar Pacotes ---
-# install.packages("tidytuesdayR")
-# install.packages("tidyverse")
-# install.packages("lubridate")
-# Começamos do zero para garantir
+#####========== Exercício 2---------------------
+# --- 1. LIMPEZA E CONFIGURAÇÃO ---
+# Limpa o ambiente para evitar erros de dataframes antigos
 rm(list = ls())
+
+# Carregar bibliotecas necessárias
 library(tidytuesdayR)
 library(tidyverse)
 library(lubridate)
 
-# Carregar dados
+# --- 2. CARREGAR DADOS ---
+# Carrega a lista de dataframes
 tuesdata <- tidytuesdayR::tt_load(2021, week = 48)
 
-# Extrair os dataframes limpos
+# Extrai os dataframes base "limpos"
 episodes <- tuesdata$episodes
 directors <- tuesdata$directors
 writers <- tuesdata$writers
 
-# --- 2. CRIAR O DATAFRAME MESTRE ---
-# Esta é a etapa que estava faltando.
-# Juntamos tudo pelo 'story_number'
-data_completo <- episodes %>%
-    inner_join(directors, by = "story_number") %>%
+# --- 3. RESPONDER ÀS PERGUNTAS (Com os parâmetros NOVOS) ---
+
+# Q1: Dupla de diretor (Joe Ahearne) e escritor (Russell T Davies)
+# Etapa A: Encontrar as histórias de cada um
+ahearne_stories <- directors %>% 
+    filter(director == "Joe Ahearne")
+
+davies_stories <- writers %>% 
+    filter(writer == "Russell T Davies")
+
+# Etapa B: Encontrar as 'story_number' em comum
+common_stories <- inner_join(ahearne_stories, davies_stories, by = "story_number")
+
+# Etapa C: Juntar com 'episodes' e contar os episódios únicos
+resposta_1 <- episodes %>%
+    inner_join(common_stories, by = "story_number") %>%
+    distinct(episode_number) %>%
+    nrow()
+
+
+# Q2: Episódios do escritor Chris Chibnall em 2018
+# Criar um dataframe focado em escritores
+data_writers <- episodes %>%
     inner_join(writers, by = "story_number")
 
-# --- 3. RESPONDER ÀS PERGUNTAS (Usando o 'data_completo') ---
-
-# Q1: Dupla (Jamie Magnus Stone) e (Chris Chibnall)
-# Filtra onde o diretor E o escritor estão na mesma 'story'
-resposta_1 <- data_completo %>%
-    filter(
-        director == "Jamie Magnus Stone", 
-        writer == "Chris Chibnall"
-    ) %>%
-    # Contamos os episódios únicos resultantes dessa combinação
-    distinct(episode_number) %>%
-    nrow()
-
-# Q2: Episódios do escritor Steven Moffat em 2011
-resposta_2 <- data_completo %>%
+resposta_2 <- data_writers %>%
     mutate(year = year(first_aired)) %>%
     filter(
-        writer == "Steven Moffat", 
-        year == 2011
+        writer == "Chris Chibnall", # <-- Parâmetro Novo
+        year == 2018              # <-- Parâmetro Novo
     ) %>%
     distinct(episode_number) %>%
     nrow()
 
-# Q3: Quantos anos Steven Moffat trabalhou na série?
-resposta_3 <- data_completo %>%
-    filter(writer == "Steven Moffat") %>%
+
+# Q3: Quantos anos Frank Cottrell-Boyce trabalhou na série?
+# (Usando o 'data_writers' que já criamos)
+resposta_3 <- data_writers %>%
+    filter(writer == "Frank Cottrell-Boyce") %>%
     mutate(year = year(first_aired)) %>%
     filter(!is.na(year)) %>%
     distinct(year) %>% # Contagem de anos únicos
     nrow()
 
-# Q4: Quantos roteiros (episódios) Steven Moffat escreveu?
-resposta_4 <- data_completo %>%
-    filter(writer == "Steven Moffat") %>%
+
+# Q4: Quantos roteiros (episódios) Frank Cottrell-Boyce escreveu?
+# (Usando o 'data_writers')
+resposta_4 <- data_writers %>%
+    filter(writer == "Frank Cottrell-Boyce") %>%
     distinct(episode_number) %>%
     nrow()
 
-# Q5: Duração média dos episódios dirigidos por Emma Sullivan?
-# Precisamos isolar os episódios únicos primeiro para não duplicar a média
-episodios_emma <- data_completo %>%
-    filter(director == "Emma Sullivan") %>%
-    # Pega cada episódio único e sua duração
+
+# Q5: Duração média dos episódios dirigidos por Joe Ahearne?
+# Criar um dataframe focado em diretores
+data_directors <- episodes %>%
+    inner_join(directors, by = "story_number")
+
+# Etapa A: Isolar os episódios únicos dirigidos por ele
+episodios_ahearne <- data_directors %>%
+    filter(director == "Joe Ahearne") %>% # <-- Parâmetro Novo
     distinct(episode_number, duration) 
 
-# Agora calculamos a média sobre os episódios únicos
-resposta_5_data <- episodios_emma %>%
+# Etapa B: Calcular a média sobre esses episódios únicos
+resposta_5_data <- episodios_ahearne %>%
     filter(!is.na(duration)) %>%
     summarise(mean_duration = mean(duration))
 
 resposta_5 <- resposta_5_data$mean_duration
 
+
 # --- 4. EXIBIR RESULTADOS FINAIS ---
+# Função para formatar com duas casas decimais
 format_decimal <- function(x) {
     format(round(x, 2), nsmall = 2)
 }
 
 cat("\n")
 cat("==================================================\n")
-cat("RESULTADOS (COM JOINS CORRETOS)\n")
+cat("RESULTADOS (DR. WHO - Conjunto 5)\n")
 cat("==================================================\n")
 
-cat("Resposta 1 (Dupla Stone/Chibnall):", 
+cat("Resposta 1 (Dupla Ahearne/Davies):", 
     format_decimal(resposta_1), "episódios\n")
 
-cat("Resposta 2 (Steven Moffat em 2011):", 
+cat("Resposta 2 (Chris Chibnall em 2018):", 
     format_decimal(resposta_2), "episódios\n")
 
-cat("Resposta 3 (Anos de Steven Moffat):", 
+cat("Resposta 3 (Anos Frank Cottrell-Boyce):", 
     format_decimal(resposta_3), "anos\n")
 
-cat("Resposta 4 (Roteiros de Steven Moffat):", 
+cat("Resposta 4 (Roteiros Frank Cottrell-Boyce):", 
     format_decimal(resposta_4), "roteiros (episódios)\n")
 
-cat("Resposta 5 (Média Emma Sullivan):", 
+cat("Resposta 5 (Média Joe Ahearne):", 
     format_decimal(resposta_5), "minutos\n")
 
 cat("==================================================\n")
+
