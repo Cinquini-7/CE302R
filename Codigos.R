@@ -211,3 +211,4 @@ cat("Q3 (Anos Tom MacRae - Intervalo):", resposta_3, "anos\n")
 cat("Q4 (Roteiros Tom MacRae):", resposta_4, "roteiros\n")
 cat("Q5 (Média Ashley Way):", format_decimal(resposta_5), "minutos\n")
 cat("==============================================================================\n")
+a
